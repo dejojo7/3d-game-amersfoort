@@ -2,52 +2,123 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Amersfoort 3D Story Game</title>
+  <title>3D Story Game – Amersfoort</title>
   <style>
-    body { margin: 0; overflow: hidden; font-family: Arial, sans-serif; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
     #story {
       position: absolute;
-      top: 20px;
-      left: 20px;
-      right: 20px;
-      background: rgba(255,255,255,0.8);
-      padding: 15px;
-      border-radius: 8px;
-      font-size: 1.2em;
-      max-width: 600px;
-      z-index: 10;
-    }
-    #choices {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      right: 20px;
-      display: flex;
-      gap: 10px;
-      max-width: 600px;
-      z-index: 10;
+      top: 10px;
+      left: 10px;
+      width: 300px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 1;
     }
     button {
-      padding: 10px 15px;
-      font-size: 1em;
-      cursor: pointer;
-      border: none;
-      border-radius: 5px;
-      background: #007bff;
-      color: white;
-      transition: background 0.3s;
-    }
-    button:hover {
-      background: #0056b3;
+      margin-top: 10px;
+      display: block;
+      width: 100%;
+      padding: 8px;
     }
   </style>
 </head>
 <body>
-  <div id="story">Loading story...</div>
-  <div id="choices"></div>
-
-  <!-- ✅ Use direct CDN scripts for THREE and OrbitControls -->
+  <div id="story">
+    <div id="storyText">Loading story...</div>
+    <button onclick="makeChoice(0)">Choice 1</button>
+    <button onclick="makeChoice(1)">Choice 2</button>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
-
   <script>
+    let scene, camera, renderer, controls;
+
+    window.onload = () => {
+      // Basic scene setup
+      scene = new THREE.Scene();
+      camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(0, 5, 10);
+
+      renderer = new THREE.WebGLRenderer();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      document.body.appendChild(renderer.domElement);
+
+      controls = new OrbitControls(camera, renderer.domElement);
+
+      // Lights
+      const light = new THREE.DirectionalLight(0xffffff, 1);
+      light.position.set(10, 10, 10);
+      scene.add(light);
+
+      // Ground
+      const ground = new THREE.Mesh(
+        new THREE.PlaneGeometry(100, 100),
+        new THREE.MeshStandardMaterial({ color: 0x77dd77 })
+      );
+      ground.rotation.x = -Math.PI / 2;
+      scene.add(ground);
+
+      // Simple Amersfoort-style object
+      const tower = new THREE.Mesh(
+        new THREE.BoxGeometry(2, 5, 2),
+        new THREE.MeshStandardMaterial({ color: 0x5555ff })
+      );
+      tower.position.set(-3, 2.5, 0);
+      scene.add(tower);
+
+      const tower2 = tower.clone();
+      tower2.position.set(3, 2.5, 0);
+      scene.add(tower2);
+
+      animate();
+    };
+
+    function animate() {
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    // Simple story data
+    const story = [
+      {
+        text: "You are in Amersfoort, struggling to find a job. One day, someone approaches you with a suspicious offer...",
+        choices: ["Listen", "Walk away"]
+      },
+      {
+        text: "You listen carefully. It's a risky job, but it pays well. Do you accept it?",
+        choices: ["Accept the job", "Refuse and keep searching"]
+      },
+      {
+        text: "You walk away. Maybe it’s for the best. Later that day, you see a job post for a museum guide.",
+        choices: ["Apply for museum job", "Ignore and go home"]
+      }
+    ];
+
+    let currentStep = 0;
+
+    function updateStory() {
+      const step = story[currentStep];
+      document.getElementById("storyText").innerText = step.text;
+      const buttons = document.querySelectorAll("button");
+      buttons[0].innerText = step.choices[0] || "End";
+      buttons[1].innerText = step.choices[1] || "End";
+    }
+
+    function makeChoice(choiceIndex) {
+      if (currentStep === 0) {
+        currentStep = choiceIndex === 0 ? 1 : 2;
+      } else {
+        currentStep = 0; // Reset the story after second choice
+      }
+      updateStory();
+    }
+
+    updateStory();
+  </script>
+</body>
+</html>
