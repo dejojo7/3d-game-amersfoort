@@ -33,13 +33,15 @@
     <button onclick="makeChoice(0)">Choice 1</button>
     <button onclick="makeChoice(1)">Choice 2</button>
   </div>
+
+  <!-- Load Three.js and OrbitControls -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+
   <script>
     let scene, camera, renderer, controls;
 
     window.onload = () => {
-      // Basic scene setup
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
       camera.position.set(0, 5, 10);
@@ -50,12 +52,10 @@
 
       controls = new OrbitControls(camera, renderer.domElement);
 
-      // Lights
       const light = new THREE.DirectionalLight(0xffffff, 1);
       light.position.set(10, 10, 10);
       scene.add(light);
 
-      // Ground
       const ground = new THREE.Mesh(
         new THREE.PlaneGeometry(100, 100),
         new THREE.MeshStandardMaterial({ color: 0x77dd77 })
@@ -63,7 +63,6 @@
       ground.rotation.x = -Math.PI / 2;
       scene.add(ground);
 
-      // Simple Amersfoort-style object
       const tower = new THREE.Mesh(
         new THREE.BoxGeometry(2, 5, 2),
         new THREE.MeshStandardMaterial({ color: 0x5555ff })
@@ -76,6 +75,7 @@
       scene.add(tower2);
 
       animate();
+      updateStory();
     };
 
     function animate() {
@@ -83,7 +83,6 @@
       renderer.render(scene, camera);
     }
 
-    // Simple story data
     const story = [
       {
         text: "You are in Amersfoort, struggling to find a job. One day, someone approaches you with a suspicious offer...",
@@ -113,12 +112,10 @@
       if (currentStep === 0) {
         currentStep = choiceIndex === 0 ? 1 : 2;
       } else {
-        currentStep = 0; // Reset the story after second choice
+        currentStep = 0;
       }
       updateStory();
     }
-
-    updateStory();
   </script>
 </body>
 </html>
